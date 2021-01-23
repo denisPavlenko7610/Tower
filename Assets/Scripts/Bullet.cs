@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
     private Transform target;
-    [SerializeField] float speed = 50f;
+    private float speed = 50f;
+
+    public float explosionRadius = 0f;
+    public GameObject impactEffect;
 
     //Find different targets and add to bullet
     public void Seek(Transform _target)
@@ -21,9 +21,15 @@ public class Bullet : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+    }
 
+    void FixedUpdate()
+    {
         Vector3 directionToTarget = target.position - transform.position;
         float distanseThisFrame = speed * Time.deltaTime;
+
+        transform.Translate(directionToTarget.normalized * distanseThisFrame, Space.World);
+        transform.LookAt(target);
 
         //Check distanse to target
         if (directionToTarget.magnitude <= distanseThisFrame)
@@ -31,13 +37,15 @@ public class Bullet : MonoBehaviour
             HitTarget();
             return;
         }
-
-        transform.Translate(directionToTarget.normalized * distanseThisFrame, Space.World);
-
     }
+
 
     private void HitTarget()
     {
+        GameObject effectsInstance = (GameObject)Instantiate(impactEffect, transform.position, transform.rotation);
+        Destroy(effectsInstance, 2f);
+
         Destroy(gameObject);
     }
+
 }

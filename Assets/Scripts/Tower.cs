@@ -14,36 +14,30 @@ public class Tower : MonoBehaviour
     [SerializeField] Transform partToRotate;
     [SerializeField] GameObject bulletPrefab;
     [SerializeField] Transform firePoint;
+    [SerializeField] GameObject explotion;
 
     private Transform target;
     private string enemyTag = "Enemy";
 
+    private int towersLevel = 2;
     private int health;
     private int armor;
-    private int towersLevel;
     private float fireRate;
     private float fireCountdouwn;
     private int damage;
-    private bool levelUp;
     private int maxLevel = 3;
 
     void Start()
     {
-        towersLevel = 1;
-        levelUp = false;
-        CheckTowersLevel();
+        SetTowersLevel(towersLevel);
         InvokeRepeating("UpdateTarget", 0, 0.5f);
     }
 
     void Update()
     {
-        RotateTowerGun();
-        if (levelUp)
-        {
-            NextLevel();
-        }
+        LookOnTarget();
 
-        if (fireCountdouwn <= 0f)
+        if (target && fireCountdouwn <= 0f)
         {
             Shoot();
             fireCountdouwn = 1f / fireRate;
@@ -54,8 +48,11 @@ public class Tower : MonoBehaviour
 
     private void Shoot()
     {
+        GameObject explotionEffects = (GameObject)Instantiate(explotion, firePoint.position, firePoint.rotation);
+        Destroy(explotionEffects, 2f);
+
         GameObject bulletGameObject = (GameObject)Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
-        Bullet bullet = GetComponent<Bullet>();
+        Bullet bullet = bulletGameObject.GetComponent<Bullet>();
 
         if (bullet != null)
         {
@@ -63,7 +60,7 @@ public class Tower : MonoBehaviour
         }
     }
 
-    private void RotateTowerGun()
+    private void LookOnTarget()
     {
         if (target)
         {
@@ -95,6 +92,7 @@ public class Tower : MonoBehaviour
                 nearestEnemy = enemy;
             }
 
+            //Set nearest enemy
             if (nearestEnemy != null && shortestDistance <= radiusAttack)
             {
                 target = nearestEnemy.transform;
@@ -106,19 +104,17 @@ public class Tower : MonoBehaviour
         }
     }
 
-    void NextLevel()
+    public void Upgrade()
     {
         if (towersLevel <= maxLevel)
         {
-            towersLevel++;
-            CheckTowersLevel();
-            levelUp = false;
+            SetTowersLevel(towersLevel++);
         }
     }
 
-    private void CheckTowersLevel()
+    private void SetTowersLevel(int level)
     {
-        switch (towersLevel)
+        switch (level)
         {
             case 1:
                 health = 500;
