@@ -19,7 +19,7 @@ public class Tower : MonoBehaviour
     private Transform target;
     private string enemyTag = "Enemy";
 
-    private int towersLevel = 2;
+    private int towersLevel = 1;
     private int health;
     private int armor;
     private float fireRate;
